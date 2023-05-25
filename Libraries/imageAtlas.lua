@@ -49,8 +49,8 @@ function imageAtlas.init(path, configPath)
     end
   end
   function result.save(fullAtlas, path)
-    image.save(path..'/atlas.pic', fullAtlas.atlas.image)
-    fs.writeTable(path..'/config.cfg', fullAtlas.config)
+    image.save(path..'/Atlas.pic', fullAtlas.atlas.image)
+    fs.writeTable(path..'/Config.cfg', fullAtlas.config)
   end
   return result
 end

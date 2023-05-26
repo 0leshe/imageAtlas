@@ -25,6 +25,7 @@ function imageAtlas.init(path, configPath)
   result.getImage = function(atlasFull, setImage)
     local atlas = atlasFull.atlas
     local config = atlasFull.config
+    if not config[setImage] then return false end
     local resultImage = image.create(config[setImage].w, config[setImage].h)
     local imageConfig = config[setImage]
     for x = 1, imageConfig.w do

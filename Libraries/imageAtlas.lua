@@ -3,25 +3,26 @@ local gui = require('gui')
 local fs = require('filesystem')
 local imageAtlas = {}
 function imageAtlas.init(path, configPath)
+  local tmpx, tmpy
   if type(path) == 'number' then
-    local tmpx = path
+    tmpx = path
   end
   if type(configPath) == 'number' then
-    local tmpy = configPath
+    tmpy = configPath
   end
-  local result = {}
-  if configPath and type(configPath) == 'string' then
+  local result = {config={}}
+  if type(configPath) == 'string' then
     result.config = fs.readTable(configPath)
-  else
-    result.config = {w=50, h=50}
   end
   result.atlas = {}
   if type(path) == 'string' then
     result.atlas.image = image.load(path)
   else
     result.atlas.image = image.create(tmpx or 160, tmpy or 50)
-    tmpx, tmpy = nil, nil
   end
+  tmpx, tmpy = nil, nil
+  result.config.w=image.getWidth(result.atlas.image)
+  result.config.h=image.getHeight(result.atlas.image)
   result.getImage = function(atlasFull, setImage)
     local atlas = atlasFull.atlas
     local config = atlasFull.config
@@ -48,6 +49,23 @@ function imageAtlas.init(path, configPath)
         image.set(atlas.image, x+xx, y+yy, image.get(setImage, xx, yy))
       end
     end
+  end
+  result.increase = function(fullAtlas, w, h)
+    local atlas = fullAtlas.atlas
+    local config = fullAtlas.config
+    local newImage = image.create(w, h)
+    for x = 1, image.getWidth(atlas.image) do
+      for y = 1, image.getHeight(atlas.image) do
+        image.set(newImage, x, y, image.get(atlas.image, x, y))
+      end
+    end
+    config.w, config.h = w, h
+    atlas.image = newImage
+    return true
+  end
+  result.load = function(fullAtlas, pathOfAtlas)
+    fullAtlas.atlas.image = image.load(pathOfAtlas)
+    fullAtlas.config = fs.readTable(string.gsub(string.gsub(pathOfAtlas,'Atlas.pic','Config.cfg'),'atlas.pic','config.cfg'))
   end
   function result.save(fullAtlas, path)
     image.save(path..'/Atlas.pic', fullAtlas.atlas.image)
